@@ -1,0 +1,2 @@
+Erreur : 
+<?= $errorMsg ?> 
