@@ -19,13 +19,15 @@ foreach ($comments as $com): ?>
 <?php 
 if($com->is_signal() == FALSE)
 {
-	?>
+?>
+
 <p>
 	<form method="post" action="post_signal.php">
 	<input type="hidden" id='signalComment' name="signalComment" value="<?= $com->id() ?>" />
 	<input type="hidden" id='signalComment_source' name="signalComment_source" value="<?= $_GET['url'] ?>" />
 	<button type="submit">Signaler</button></form>
 </p>
+
 <?php 
 }
 else
@@ -35,6 +37,7 @@ else
 	<?php 
 }
 ?>
+<hr>
 <?php endforeach; ?> 
 
 <h3>Ajouter un commentaire</h3>
@@ -49,4 +52,4 @@ if(strlen($error)>0){
  		<br /><label for = "author">Auteur(s)</label>
  		<input type="text" required id="author" name="author" value="<?= $commentAuthor ?>"><br />
       	<br /><button type="submit">Envoyer</button><br />
-  	</form>
+  </form>
