@@ -36,23 +36,6 @@ class Model{
 		return $var;		
 	}
 
-	protected function getAllwithResume($table, $objet)
-	{
-		$db = $this->getDb();
-
-		$var = [];
-		$req = $db->prepare('SELECT `id`,`title`, CONCAT(SUBSTRING(`content`,1,200),"...") as \'content\',`author`,`published` FROM ' .$table. ' ORDER BY id DESC');
-		$req->execute();
-		$i = 0;
-		while($data = $req->fetch(PDO::FETCH_ASSOC))
-		{
-			$var[$i] = new $objet($data);
-			$i++;
-		}
-		$req->closeCursor();
-		return $var;		
-	}
-
 	protected function getLast($table, $objet)
 	{
 		$db = $this->getDb();
@@ -102,9 +85,37 @@ class Model{
 		return $var;	
 	}
 
-	protected function postComment($post_id, $author, $comment)
+	//Get comment signaled
+	protected function getSignal($table, $objet)
+	{
+		$db = $this->getDb();
+
+		$var = [];
+		$comments = $db->prepare("SELECT * FROM " .$table. " WHERE is_signal = TRUE ORDER BY is_signal_date DESC");
+	    $comments->execute(array(""));
+
+		$i = 0;
+		while($data = $comments->fetch(PDO::FETCH_ASSOC))
+		{
+			$var[$i] = new $objet($data);
+			$i++;
+		}
+		$comments->closeCursor();
+		return $var;	
+	}
+
+	protected function UndoSignalComment($commentId)
 	{
     
+		$db = $this->getDb();
+	    $comments = $db->prepare('UPDATE `comments` SET `is_signal`= FALSE  WHERE `id`= ? ');
+	    $affectedLines = $comments->execute(array($commentId));
+
+	    return $affectedLines;
+	}
+
+	protected function postComment($post_id, $author, $comment)
+	{    
 		$db = $this->getDb();
 	    $comments = $db->prepare('INSERT INTO comments(post_id, author, comment, comment_date) VALUES(?, ?, ?, NOW())');
 	    $affectedLines = $comments->execute(array($post_id, $author, $comment));
@@ -112,35 +123,43 @@ class Model{
 	    return $affectedLines;
 	}
 
-	protected function signalComment($commentId)
-	{
-    
+	protected function deleteComment($commentId)
+	{    
 		$db = $this->getDb();
-	    $comments = $db->prepare('UPDATE `comments` SET `is_signal`= TRUE ,`is_signal_date`= NOW() WHERE `id`= ? ');
+	    $comments = $db->prepare('DELETE FROM `comments` WHERE `id`= ? ');
 	    $affectedLines = $comments->execute(array($commentId));
 
 	    return $affectedLines;
 	}
 
-	protected function validateConnexion($login, $mdp)
-	{
-		$mdp = hash('sha256', $mdp);
+	protected function postChapter($title, $content, $author)
+	{    
 		$db = $this->getDb();
-		$var = '';
-		$req = $db->prepare('SELECT id FROM `users` WHERE `username` = ? AND `password` = ?');
-		$req->execute(array($login, $mdp));
+	    $chapters = $db->prepare('INSERT INTO articles(title, content, author, published) VALUES(?, ?, ?, NOW())');
+	    $affectedLines = $chapters->execute(array($title, $content, $author));
 
-		while($data = $req->fetch(PDO::FETCH_ASSOC))
-		{
-			$var = 'success';
-		}
-		$req->closeCursor();
-		if(strlen($var) >0)
-			return true;
-		else
-			return false;	
+	    return $affectedLines;
 	}
 
+	protected function deleteChapter($id)
+	{    
+		$db = $this->getDb();
+	    $chapters = $db->prepare('DELETE FROM articles  WHERE id = ?');
+	    $affectedLines = $chapters->execute(array($id));
 
+	    $comments = $db->prepare('DELETE FROM `comments` WHERE `post_id`= ? ');
+	    $affectedLines = $comments->execute(array($id));
+
+	    return $affectedLines;
+	}
+
+	protected function updateChapter($id, $title, $content, $author)
+	{    
+		$db = $this->getDb();
+	    $chapters = $db->prepare('UPDATE `articles` SET `title`= ?,`content`= ?,`author`= ?,`published`= NOW() WHERE `id`= ?' );
+	    $affectedLines = $chapters->execute(array($title, $content, $author,$id));
+
+	    return $affectedLines;
+	}
 }		
 ?>

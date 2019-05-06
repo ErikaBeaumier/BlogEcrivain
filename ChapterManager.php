@@ -3,7 +3,7 @@ class ChapterManager extends Model
 {
 	public function getChapters()
 	{
-		return $this->getAllwithResume('articles', 'Article');
+		return $this->getAll('articles', 'Article');
 	}
 
 	public function getLastChap()
@@ -23,9 +23,25 @@ class ChapterManager extends Model
 		return $this->getComs('comments', 'Comments',$post_id);
 	}
 
-	public function insertComments($post_id, $author, $comment)
+	//get all comments signaled
+	public function getModerate()
 	{
-		$this->postComment($post_id, $author, $comment);
+		return $this->getSignal('comments', 'Comments');
+	}
+
+	public function insertChapter($title, $content, $author)
+	{
+		$this->postChapter($title, $content, $author);
+	}
+
+	public function supprimChapter($id)
+	{
+		$this->deleteChapter($id);
+	}
+
+	public function reformChapter($id, $title, $content, $author)
+	{
+		$this->updateChapter($id, $title, $content, $author);
 	}
 }
 

@@ -18,30 +18,20 @@ class View
 
 		switch($this->_action)
 		{
-		 // Display Home Page
-		 case 'Home':
+		 // Display Dashboard Page
+		 case 'Dashboard':
 			$data = ['chapters'=> [$p_data['chapters']]];
 		  break;
 
-		 // Display Chapters List
-		 case 'List':
+		 // Display Write Page
+		 case 'Write':
 		 	$data = $p_data;
 		  break;
 
-		  // Display One Chapter with comments
-		  case 'Post':
+		  // Display Moderate comments
+		  case 'Moderate':
 			$data = $p_data;
 		  break;
-
-		  //Display About Page
-		  case 'About':
-		  	$data = "";
-		  break;	
-
-		  //Display Contact Page
-		  case 'Contact':
-		  	$data = $p_data;
-		  break;	  	
 
 		  // Default display
 		 default :
@@ -62,9 +52,8 @@ class View
 	{
 		if(file_exists($file))
 		{
-			if(is_array($data))
-				extract($data);
-
+			extract($data);
+			
 			ob_start();
 
 			require $file;

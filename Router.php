@@ -1,5 +1,14 @@
 <?php
 
+if(!isset($_SESSION['BO']))
+{
+  session_start();
+  $_SESSION['BO'] = "session open";
+  	//user not connected
+	if(!isset($_SESSION['user']))
+		header('Location: ../07_Projet_3_mvc/Login');
+}
+
 require_once('views/View.php');
 
 class Router{
@@ -10,7 +19,6 @@ class Router{
 	{
 		try
 		{
-			
 			//Automatic loading of class
 			spl_autoload_register(function($class){
 				require_once('models/'.$class.'.php');
@@ -38,8 +46,8 @@ class Router{
 
 			else
 			{
-				require_once('controllers/ControllerHome.php');
-				$this->_controller = new ControllerHome(['Home']);
+				require_once('controllers/ControllerDashboard.php');
+				$this->_controller = new ControllerDashboard(['Dashboard']);
 			}
 		}
 		//Errors management
